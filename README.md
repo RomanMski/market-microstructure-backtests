@@ -26,7 +26,27 @@ From there, the project developed into a full research workflow:
 10. Run hostile robustness checks such as entry delay, exit delay, higher costs, and monthly breakdowns.
 
 ---
+---
 
+## Selected Figures
+
+### Long-Horizon Equity Curve
+
+![Long-Horizon Equity Curve](reports/figures/xauusd_LONGHORIZON_test_equity_cost1p0bps.png)
+
+### Hostile Audit Equity Curve
+
+![Hostile Audit Equity Curve](reports/figures/xauusd_HOSTILE_AUDIT_harsh_case_equity.png)
+
+### Feature Importance
+
+![Feature Importance](reports/figures/xauusd_strict_feature_importance.png)
+
+### Cost Sensitivity
+
+![Cost Sensitivity](reports/figures/xauusd_LONGHORIZON_test_cost_sensitivity.png)
+
+---
 ## Data
 
 The project currently focuses on:
