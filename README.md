@@ -4,7 +4,7 @@ High-frequency XAUUSD market data research: deviation signals, cost-aware backte
 
 The project studies how gold behaves after short-term price deviations from rolling moving averages. The goal is not to present a live trading system, but to build a serious research workflow: data preparation, signal discovery, sequential backtesting, cost sensitivity, walk-forward validation, event filtering, and robustness checks.
 
-> **Note:** This is a research project, not a live trading system. Historical backtest results are not live trading claims. Execution quality, spreads, slippage, latency, broker-specific costs, and paper-trading validation remain open issues.
+> **Note:** This is a research project, not a live trading system. Historical backtest results are not live trading claims. Execution quality, spreads, slippage, latency, broker-specific costs, and paper trading validation remain open issues.
 
 ---
 
@@ -18,13 +18,13 @@ To test this, I built a research pipeline around 1-second XAUUSD data.
 
 The project evolved from basic signal exploration into a more complete backtesting workflow:
 
-1. Load and clean high-frequency market data.
+1. Load and clean high frequency market data.
 2. Store the data efficiently with parquet.
 3. Compute rolling moving averages and deviation signals.
 4. Measure how price behaves after different deviation levels.
 5. Build sequential backtests with realistic trade rules.
 6. Add transaction costs and stress-test assumptions.
-7. Use walk-forward train/validation/test splits.
+7. Use walk forward train/validation/test splits.
 8. Compare filtered signals against unfiltered and random baselines.
 9. Run hostile checks such as entry delay, exit delay, fixed exits, flexible exits, and monthly breakdowns.
 
@@ -55,8 +55,8 @@ The main idea is simple:
 The project currently focuses on:
 
 - **XAUUSD 1-second market data**
-- high-frequency OHLC-style time series
-- parquet-based storage for faster loading and analysis
+- high frequency OHLC-style time series
+- parquet based storage for faster loading and analysis
 
 Raw data is **not included** in this repository.
 
@@ -98,7 +98,7 @@ The backtest includes:
 - fixed take-profit
 - stop-loss
 - maximum holding time
-- transaction-cost assumptions
+- transaction cost assumptions
 - different exit rules
 - train/validation/test separation
 
@@ -107,15 +107,15 @@ Exit types tested include:
 - fixed TP/SL
 - protected flexible TP
 - unprotected flexible TP
-- time-based exit
+- time based exit
 
-This matters because high-frequency strategies can look good if the backtest is too generous. I wanted to check whether the idea still worked after making the simulation more realistic.
+This matters because high frequency strategies can look good if the backtest is too generous. I wanted to check whether the idea still worked after making the simulation more realistic.
 
 ---
 
 ## Event Filtering
 
-A later part of the project uses an event-filtering approach.
+A later part of the project uses an event filtering approach.
 
 The basic idea:
 
@@ -128,11 +128,11 @@ The basic idea:
 Entry-time features include:
 
 - deviation from MA300 / MA500
-- recent short-horizon returns
+- recent short horizon returns
 - moving-average slope
 - rolling volatility
 - distance from recent highs/lows
-- time-of-day features
+- time of day features
 
 The goal is not to magically predict the future, but to test whether some deviation events are statistically better than others before the rebound happens.
 
@@ -184,8 +184,8 @@ The first version of the signal produced many small mean-reversion trades. That 
 This shifted the project toward:
 
 - fewer but higher-quality candidate events
-- cost-aware filtering
-- walk-forward validation
+- cost aware filtering
+- walk forward validation
 - comparing against baselines
 - checking whether results survive delays and stricter exit assumptions
 
@@ -236,7 +236,7 @@ This project is research-only and not a live trading system.
 Important remaining limitations include:
 
 - historical results may not survive live execution
-- broker-specific spreads and commissions are not fully modelled
+- broker specific spreads and commissions are not fully modelled
 - fill quality and latency are simplified
 - slippage can change results significantly
 - XAUUSD execution depends strongly on the trading venue
@@ -245,21 +245,3 @@ Important remaining limitations include:
 - paper trading and broker-specific execution modelling would be needed before any live deployment
 
 ---
-
-## Next Steps
-
-Planned improvements:
-
-- clean notebook outputs for public presentation
-- modularize research code into reusable Python files
-- add more conservative execution modelling
-- add paper-trading style forward tests
-- compare performance across different market regimes
-- test whether similar structures appear in other liquid instruments
-- improve visual reports and summary dashboards
-
----
-
-## Purpose
-
-This repository is part of my portfolio as a Financial Mathematics student interested in quantitative research, statistical modelling, high-frequency data analysis, and systematic trading research.
