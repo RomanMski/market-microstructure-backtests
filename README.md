@@ -1,6 +1,6 @@
 # market-microstructure-backtests
 
-High-frequency XAUUSD market data research project focused on short-horizon mean-reversion, transaction costs, and robust backtesting.
+High-frequency XAUUSD market data research: deviation signals, cost-aware backtests, walk-forward validation, and robustness checks.
 
 The project studies how gold behaves after short-term price deviations from rolling moving averages. The goal is not to present a live trading system, but to build a serious research workflow: data preparation, signal discovery, sequential backtesting, cost sensitivity, walk-forward validation, event filtering, and robustness checks.
 
