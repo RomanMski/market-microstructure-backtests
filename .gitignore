@@ -1,0 +1,32 @@
+# data
+data/
+Data/
+*.parquet
+*.csv
+*.zip
+*.h5
+*.feather
+
+# outputs / logs
+outputs/
+logs/
+*.log
+
+# notebooks
+.ipynb_checkpoints/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+_envs/
+env/
+venv/
+
+# system
+.DS_Store
+Thumbs.db
+
+# local paths / secrets
+.env
+*.secret
