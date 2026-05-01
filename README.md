@@ -21,6 +21,7 @@ To test this, I built a research pipeline around 1 second XAUUSD data. I downloa
 <a href="reports/figures/xauusd_rebound_vs_entrydev_2x2_1y.png">
   <img src="reports/figures/xauusd_rebound_vs_entrydev_2x2_1y.png" alt="Entry deviation vs future rebound" width="900">
 </a>
+
 ### Hostile Audit Equity Curve
 
 ![Hostile Audit Equity Curve](reports/figures/xauusd_HOSTILE_AUDIT_harsh_case_equity.png)
