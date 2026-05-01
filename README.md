@@ -42,7 +42,7 @@ To test this, I built a research pipeline around 1 second XAUUSD data. I downloa
 - high frequency OHLC style time series
 - parquet based storage for faster loading and analysis (less compute time :)
 
-The local workflow is roughly
+workflow is simply
 
 ```text
 raw data -> cleaned time series -> parquet files -> feature generation -> research outputs
