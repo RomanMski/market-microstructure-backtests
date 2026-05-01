@@ -111,23 +111,19 @@ The goal is not to magically predict the future, but to test whether some deviat
 
 ## Walk-Forward Validation
 
-To reduce overfitting, I used time-based splits.
-
-Example long-horizon setup:
+To reduce overfitting, I used time based splits an example long horizon setup:
 
 - **Train:** 2023
 - **Validation:** 2024
 - **Final test:** 2025-2026
 
-The model is trained on the training period. Strategy settings are selected on the validation period. The final test period is then used only after the rules are fixed.
-
-This is important because testing and tuning on the same period can easily create misleading results.
+The model is trained on the training period. Strategy settings are selected on the validation period. The final test period is then used only after the rules are fixed. This is important because testing and tuning on the same period can easily create misleading results.
 
 ---
 
 ## Robustness Checks
 
-Several hostile checks are included to see whether the results depend on fragile assumptions.
+I included several hostile checks to see whether the results depended on fragile assumptions.
 
 - transaction costs from 1 to 10 bps
 - fixed TP only
