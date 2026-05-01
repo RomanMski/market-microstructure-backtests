@@ -11,9 +11,10 @@ In this small project i study how gold behaves after extreme short term price de
 
 I started with a simple question:
 
-> When price moves unusually far below a rolling moving average on a rather small timeframe, does it tend to rebound over the next few minutes? (because most of the data is in a bell shape arround the MA, thus indicating it should have a tendency to revert back from every outliar in %-deviations of the signal below the MA, even if its just a little bit.
+When price compared to a fixed slow MA is an outliar from the data, far below a rolling moving average on a rather small timeframe, does it tend to rebound? 
+The intuition was that significant short term deviations from a slow rolling average may contain some mean reversion behavior, but this only matters if the effect survives transaction costs and realistic exit assumptions.
 
-To test this, I built a research pipeline around 1 second XAUUSD data. I downloaded the market data from https://www.dukascopy.com, then for time efficency purposes converted the zips into csvs then parquet, computed the rolling averages and deviation signals and looked for the distribution of the data and interesting zones where we get a relativly high n-trades while still having a reasonable tp and safety system to not hold unrealised pnls. After finding some promising ranges, which i could read out pretty well from the heatmaps i generated i started backtesting, each backtest i went over the most promising combination as well with a small degree of randomness to increase the likelyhood of finding the best combinations. I got some very promising results with returns over 400x in less then a year, but that were mostly just tight market making parameters and with realistic fees those strategies didnt work. After i added realistic slippage/fees the ranges and parameters chanegs a lot, as now we would need a high enugh difference between buy and sell to cover slippage and fees, so the best working combinations turned out to be the ones with relativly high n-trades while keeping the difference between buy and sell high and tighning the trade timespan and sl. Most trades were actually executed and ran for a relativly small time period of a few dozen bars so closing the trade after this timespan made the model work a lot better.
+To test this, I built a research pipeline around 1 second XAUUSD data. I downloaded the market data from https://www.dukascopy.com, then for time efficency purposes converted the zips into csvs then parquet, computed the rolling averages and deviation signals and looked for the distribution of the data and interesting zones where we get a relativly high n-trades while still having a reasonable tp and safety system to not hold unrealised pnls. After finding some promising ranges, which i could read out pretty well from the heatmaps i generated i started backtesting, each backtest i went over the most promising combination as well with a small degree of randomness to increase the likelyhood of finding the best combinations. I got some very promising results with returns, the first version of the signal produced many small mean reversion trades. That looked interesting, but many small trades are very sensitive to costs and with realistic fees those strategies didnt work. After i added realistic slippage/fees the ranges and parameters chanegs a lot, as now we would need a high enugh difference between buy and sell to cover slippage and fees, so the best working combinations turned out to be the ones with relativly high n-trades while keeping the difference between buy and sell high and tighning the trade timespan and sl. Most trades were actually executed and ran for a relativly small time period of a few dozen bars so closing the trade after this timespan made the model work a lot better.
 
 ---
 
@@ -38,10 +39,8 @@ To test this, I built a research pipeline around 1 second XAUUSD data. I downloa
 The project currently focuses on:
 
 - **XAUUSD 1-second market data**
-- high frequency OHLC-style time series
-- parquet based storage for faster loading and analysis
-
-Raw data is **not included** in this repository.
+- high frequency OHLC style time series
+- parquet based storage for faster loading and analysis (less compute time :)
 
 The local workflow is roughly:
 
@@ -57,17 +56,11 @@ The first part of the project studies price deviation from rolling moving averag
 
 Examples:
 
-- MA300
-- MA500
-- percentage distance from the moving average
-- future maximum rebound over a fixed horizon
-- future adverse movement over the same horizon
+- MA100-2000
+- significant percentage distance from the moving average
+- future maximum rebound over a fixed horizon after setting the buy signal at this significant deviation
 
-A typical research question is:
-
-> If price is 0.10% below MA300, what is the distribution of the maximum rebound over the next 2,000 seconds?
-
-This first step is not yet a trading strategy. It is just a way to understand whether the market has a measurable conditional response after short-term deviations.
+ For Example: If price is 0.10% below MA300, what is the distribution of the maximum rebound over the next 2,000 seconds?
 
 ---
 
@@ -78,19 +71,18 @@ After the signal research, I converted the idea into sequential trade simulation
 The backtest includes:
 
 - one open trade at a time
-- fixed take-profit
-- stop-loss
-- maximum holding time
-- transaction cost assumptions
+- fixed take profit (in a reasonable range)
+- stop loss (in a reasonable range)
+- maximum holding time (in a reasonable range)
+- transaction cost assumptions (in a range from 1-25bps)
 - different exit rules
-- train/validation/test separation
 
-Exit types tested include:
+Exit types tested included:
 
-- fixed TP/SL
-- protected flexible TP
-- unprotected flexible TP
-- time based exit
+- fixed TP/SL (but a reasonable range)
+- protected flexible TP (trailing tp)
+- unprotected flexible TP (trailing tp without as tight safety measures)
+- time based exit (so close the trade after n-seconds no matter what)
 
 This matters because high frequency strategies can look good if the backtest is too generous. I wanted to check whether the idea still worked after making the simulation more realistic.
 
@@ -98,9 +90,7 @@ This matters because high frequency strategies can look good if the backtest is 
 
 ## Event Filtering
 
-A later part of the project uses an event filtering approach.
-
-The basic idea:
+A later part of the project uses an event filtering approach
 
 1. Generate candidate events where price deviates below the moving average.
 2. Label historical events by their future rebound and drawdown.
@@ -141,8 +131,6 @@ This is important because testing and tuning on the same period can easily creat
 
 Several hostile checks are included to see whether the results depend on fragile assumptions.
 
-Examples:
-
 - transaction costs from 1 to 10 bps
 - fixed TP only
 - protected flexible TP
@@ -150,29 +138,10 @@ Examples:
 - entry delay
 - exit delay
 - extra slippage assumptions
-- no-filter baseline
+- no filter baseline
 - random same-count baseline
 - monthly performance breakdown
 
-The point of these tests is to attack the strategy from different angles.
-
-If a result only works under perfect assumptions, it is probably not useful. If it still works after harsher assumptions, it becomes more interesting as a research finding.
-
----
-
-## What I Learned
-
-The first version of the signal produced many small mean-reversion trades. That looked interesting, but many small trades are very sensitive to costs.
-
-This shifted the project toward:
-
-- fewer but higher-quality candidate events
-- cost aware filtering
-- walk forward validation
-- comparing against baselines
-- checking whether results survive delays and stricter exit assumptions
-
-The most useful lesson was that a signal can be statistically visible but still not economically useful unless it survives costs and execution assumptions.
 
 ---
 
@@ -186,24 +155,8 @@ The most useful lesson was that a signal can be statistically visible but still 
 - matplotlib
 - Jupyter
 - parquet
+- R
 
 ---
 
-## Repository Structure
-
-```text
-market-microstructure-backtests/
-|
-├── README.md
-├── .gitignore
-|
-├── notebooks/
-|   └── cleaned research notebooks
-|
-├── src/
-|   └── reusable Python modules
-|
-└── reports/
-    └── figures/
-        └── selected research figures
 ```
