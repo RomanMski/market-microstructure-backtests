@@ -36,13 +36,11 @@ To test this, I built a research pipeline around 1 second XAUUSD data. I downloa
 
 ## Data
 
-The project currently focuses on:
-
-- **XAUUSD 1-second market data**
+- **XAUUSD 1 second market data**
 - high frequency OHLC style time series
 - parquet based storage for faster loading and analysis (less compute time :)
 
-The local workflow is roughly:
+The local workflow is roughly
 
 ```text
 raw data -> cleaned time series -> parquet files -> feature generation -> research outputs
@@ -52,12 +50,10 @@ raw data -> cleaned time series -> parquet files -> feature generation -> resear
 
 ## Signal Research
 
-The first part of the project studies price deviation from rolling moving averages.
-
-Examples:
+The first part of the project studies price deviation from rolling moving averages. For Example:
 
 - MA100-2000
-- significant percentage distance from the moving average
+- significant percentage distance from the moving average so 0,1-5% 
 - future maximum rebound over a fixed horizon after setting the buy signal at this significant deviation
 
  For Example: If price is 0.10% below MA300, what is the distribution of the maximum rebound over the next 2,000 seconds?
