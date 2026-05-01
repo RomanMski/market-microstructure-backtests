@@ -66,7 +66,7 @@ The first part of the project studies price deviation from rolling moving averag
 
 After the signal research, I converted the idea into sequential trade simulations.
 
-The backtest includes:
+in the backtest i had:
 
 - one open trade at a time
 - fixed take profit (in a reasonable range)
@@ -75,7 +75,7 @@ The backtest includes:
 - transaction cost assumptions (in a range from 1-25bps)
 - different exit rules
 
-Exit types tested included:
+Exit types tested:
 
 - fixed TP/SL (but a reasonable range)
 - protected flexible TP (trailing tp)
