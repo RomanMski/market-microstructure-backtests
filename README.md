@@ -1,10 +1,9 @@
 # market-microstructure-backtests
 
-High-frequency XAUUSD market data research: deviation signals, cost-aware backtests, walk-forward validation, and robustness checks.
+High frequency XAUUSD market data research, small timeframe deviation signals, cost aware backtests, walk forward validation, and robustness checks.
 
-The project studies how gold behaves after short-term price deviations from rolling moving averages. The goal is not to present a live trading system, but to build a serious research workflow: data preparation, signal discovery, sequential backtesting, cost sensitivity, walk-forward validation, event filtering, and robustness checks.
-
-> **Note:** This is a research project, not a live trading system. Historical backtest results are not live trading claims. Execution quality, spreads, slippage, latency, broker-specific costs, and paper trading validation remain open issues.
+In this small project i study how gold behaves after extreme short term price deviations from rolling moving averages of the closing price data.
+> **Note:** This is a small research project. Historical backtest results are not live trading claims. Execution quality, spreads, slippage, latency, broker-specific costs, and paper trading validation remain open issues.
 
 ---
 
@@ -12,25 +11,9 @@ The project studies how gold behaves after short-term price deviations from roll
 
 I started with a simple question:
 
-> When price moves unusually far below a rolling moving average, does it tend to rebound over the next few minutes?
+> When price moves unusually far below a rolling moving average on a rather small timeframe, does it tend to rebound over the next few minutes? (because most of the data is in a bell shape arround the MA, thus indicating it should have a tendency to revert back from every outliar in %-deviations of the signal below the MA, even if its just a little bit.
 
-To test this, I built a research pipeline around 1-second XAUUSD data.
-
-The project evolved from basic signal exploration into a more complete backtesting workflow:
-
-1. Load and clean high frequency market data.
-2. Store the data efficiently with parquet.
-3. Compute rolling moving averages and deviation signals.
-4. Measure how price behaves after different deviation levels.
-5. Build sequential backtests with realistic trade rules.
-6. Add transaction costs and stress-test assumptions.
-7. Use walk forward train/validation/test splits.
-8. Compare filtered signals against unfiltered and random baselines.
-9. Run hostile checks such as entry delay, exit delay, fixed exits, flexible exits, and monthly breakdowns.
-
-The main idea is simple:
-
-> A signal is only interesting if it still looks reasonable after costs, delays, and robustness checks.
+To test this, I built a research pipeline around 1 second XAUUSD data. I downloaded the market data from https://www.dukascopy.com, then for time efficency purposes converted the zips into csvs then parquet, computed the rolling averages and deviation signals and looked for the distribution of the data and interesting zones where we get a relativly high n-trades while still having a reasonable tp and safety system to not hold unrealised pnls. After finding some promising ranges, which i could read out pretty well from the heatmaps i generated i started backtesting, each backtest i went over the most promising combination as well with a small degree of randomness to increase the likelyhood of finding the best combinations. I got some very promising results with returns over 400x in less then a year, but that were mostly just tight market making parameters and with realistic fees those strategies didnt work. After i added realistic slippage/fees the ranges and parameters chanegs a lot, as now we would need a high enugh difference between buy and sell to cover slippage and fees, so the best working combinations turned out to be the ones with relativly high n-trades while keeping the difference between buy and sell high and tighning the trade timespan and sl. Most trades were actually executed and ran for a relativly small time period of a few dozen bars so closing the trade after this timespan made the model work a lot better.
 
 ---
 
@@ -224,24 +207,3 @@ market-microstructure-backtests/
     └── figures/
         └── selected research figures
 ```
-
-The repository is currently being cleaned and organized. Raw data, large parquet files, and local output files are intentionally excluded.
-
----
-
-## Limitations
-
-This project is research-only and not a live trading system.
-
-Important remaining limitations include:
-
-- historical results may not survive live execution
-- broker specific spreads and commissions are not fully modelled
-- fill quality and latency are simplified
-- slippage can change results significantly
-- XAUUSD execution depends strongly on the trading venue
-- high-frequency results are very sensitive to small cost assumptions
-- flexible exit logic may be difficult to implement exactly in live markets
-- paper trading and broker-specific execution modelling would be needed before any live deployment
-
----
