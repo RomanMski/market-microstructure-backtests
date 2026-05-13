@@ -64,9 +64,7 @@ The first part of the project studies price deviation from rolling moving averag
 
 ## Sequential Backtesting
 
-After the signal research, I converted the idea into sequential trade simulations.
-
-in the backtest i had:
+After the signal research, I converted the idea into sequential trade simulations. In the backtest i had,
 
 - one open trade at a time
 - fixed take profit (in a reasonable range)
@@ -75,7 +73,7 @@ in the backtest i had:
 - transaction cost assumptions (in a range from 1-25bps)
 - different exit rules
 
-Exit types tested:
+Exit types i tested were,
 
 - fixed TP/SL (but a reasonable range)
 - protected flexible TP (trailing tp)
@@ -96,7 +94,7 @@ A later part of the project uses an event filtering approach
 4. Use the model score to filter for higher-quality candidate events.
 5. Compare the filtered strategy against unfiltered and random baselines.
 
-Entry-time features include:
+Entry time features include:
 
 - deviation from MA300 / MA500
 - recent short horizon returns
