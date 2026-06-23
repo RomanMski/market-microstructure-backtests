@@ -1,44 +1,35 @@
-# XAUUSD Microstructure Mean-Reversion Study
+# XAUUSD Intraday Mean-Reversion Research
 
-Short-horizon research note on 1-second XAUUSD data.
+Research archive for a short-horizon mean-reversion test on 1-second XAUUSD data.
 
-The project tests whether large negative deviations from rolling moving averages are followed by tradable rebounds after adding transaction costs, holding-time limits, and basic robustness checks.
+The study evaluates whether large negative deviations from rolling moving averages contain enough forward rebound to remain meaningful after transaction costs, execution-delay assumptions, and holding-time constraints.
 
-This is the first version of the research. A more adaptive cross-market version is here:
-
+Related continuation:
 [Adaptive Parameter Optimisation Algorithm](https://github.com/RomanMski/Adaptive_Parameter_Optimisation_Algorithm)
 
-> Research only. These are historical backtests, not live trading results or trading advice. Execution quality, spreads, slippage, latency, broker-specific costs, and paper/live validation remain outside the scope of this repository.
+> This repository is for research documentation only. Backtest results are not live trading results, trading advice, or evidence of deployability.
 
-## Scope
+## Abstract
 
-| Item | Description |
+The experiment scans XAUUSD price deviations from rolling moving averages, labels forward rebound and drawdown, and converts candidate regions into sequential trade simulations. Early in-sample results produced many small mean-reversion trades, but the edge became highly sensitive once costs and stricter exits were introduced.
+
+The main finding is conditional rather than conclusive: some parameter regions show short-term rebound behaviour, but the setup is fragile under transaction costs and manual parameter selection. This motivated a second version of the work focused on adaptive parameter selection and cross-market testing.
+
+## Research Design
+
+| Area | Specification |
 | --- | --- |
 | Instrument | XAUUSD |
-| Frequency | 1-second market data |
-| Data source | Dukascopy historical data |
-| Signal type | Negative deviation from rolling moving average |
-| Main question | Does price rebound enough after extreme short-term deviations to survive costs? |
-| Status | First-pass research archive, not a production trading system |
+| Frequency | 1-second data |
+| Source | Dukascopy historical data |
+| Signal | Negative deviation from rolling moving average |
+| Event label | Forward rebound and drawdown after signal time |
+| Backtest style | Sequential, one open position at a time |
+| Validation | Time-based train / validation / final test split |
+| Main risk | Cost sensitivity and parameter overfitting |
+| Status | First research version, not a packaged trading system |
 
-## Research Question
-
-The starting hypothesis was simple:
-
-> When XAUUSD trades far below a slow rolling moving average on a short timeframe, the following price path may contain mean-reversion behaviour.
-
-The useful question is not whether a rebound can be found in-sample. The harder test is whether the effect remains visible after:
-
-- transaction costs
-- slippage assumptions
-- stop loss and take profit rules
-- maximum holding time
-- train / validation / test separation
-- random and unfiltered baselines
-
-## Data Pipeline
-
-The raw data was converted into a faster research format before running the scans and backtests.
+## Data Workflow
 
 ```text
 raw Dukascopy files
@@ -47,157 +38,118 @@ raw Dukascopy files
 -> rolling features
 -> deviation events
 -> sequential backtests
--> validation reports
+-> diagnostic reports
 ```
 
-Parquet was used because repeated scans over 1-second data are slow in plain CSV form.
+The raw files were converted to parquet to make repeated scans over high-frequency data practical.
 
-## Method
+## Methodology
 
-### 1. Deviation scan
+### Event Study
 
-For each rolling moving-average window, the research checks how price behaves after large negative deviations from the moving average.
+For each moving-average window, the study measures how price behaves after large negative deviations.
 
-Example event:
+Example:
 
 ```text
-price is 0.10% below MA300
+price < MA300 by 0.10%
 -> measure maximum rebound and drawdown over the next 2,000 seconds
 ```
 
-The scan was used to find regions with enough observations and enough average rebound to justify a sequential backtest.
+The event study is used to identify regions with enough observations and enough forward movement to justify backtesting.
 
-### 2. Sequential backtest
+### Sequential Backtest
 
-The event scan was then converted into trade simulations with one open position at a time.
+Candidate regions are tested as trade rules with:
 
-Tested components included:
-
+- one open trade at a time
 - fixed take profit
 - stop loss
 - maximum holding time
 - transaction cost assumptions
-- delayed entry / delayed exit checks
-- flexible exit variants
+- delayed entry and delayed exit checks
+- fixed and flexible exit variants
 
-This step was mainly used to test whether the raw signal survived more realistic trading assumptions.
+The purpose is to test whether the raw event behaviour survives a less generous simulation.
 
-### 3. Event filtering
+### Event Filtering
 
-A later version of the project added a simple event filter. Candidate events were labelled by their future rebound and drawdown, then scored using only information available at entry time.
+A later stage adds a simple event filter trained only on information available at entry time.
 
-Entry-time features included:
+Features include:
 
 - deviation from MA300 / MA500
 - short-horizon returns
 - moving-average slope
 - rolling volatility
 - distance from recent highs and lows
-- time-of-day features
+- time-of-day variables
 
-The purpose was not to forecast every trade. The purpose was to test whether some deviation events were historically higher quality than others before the rebound occurred.
+The filter is used as a diagnostic for event quality, not as a claim of stable prediction.
 
 ## Validation
 
-The main validation setup used time-based splits:
+The main split is time based:
 
-| Period | Role |
+| Period | Use |
 | --- | --- |
 | 2023 | Training |
-| 2024 | Validation / parameter selection |
+| 2024 | Validation and parameter selection |
 | 2025-2026 | Final test |
 
-The final test period was only used after the rules were fixed. This reduces, but does not remove, data-mining risk.
+Robustness checks include:
 
-Additional checks included:
-
-- cost sensitivity from low to harsher assumptions
-- fixed-exit and flexible-exit variants
-- entry delay and exit delay
+- transaction-cost sensitivity
 - additional slippage
+- entry and exit delay
+- fixed-exit variants
+- flexible-exit variants
 - unfiltered baseline
 - random same-count baseline
 - monthly performance breakdown
 
-## Main Observations
+## Results Interpretation
 
-- The raw deviation signal is very sensitive to transaction costs.
-- Many small mean-reversion trades look acceptable before costs and weak after costs.
-- Parameter regions with more distance between entry and exit are more interesting than regions that rely on tiny rebounds.
-- Maximum holding time matters. Trades that remain open too long often stop behaving like the original short-term setup.
-- The project is useful as a first research pass, but the setup is too fixed around one instrument and one manually selected parameter workflow.
+The strongest lesson from this version is that the signal is cost-sensitive.
 
-These observations motivated the second project, which generalizes the workflow across more markets and uses a more adaptive parameter-selection process.
+Small mean-reversion trades can look attractive before costs, but many disappear after fees, slippage, and tighter exits. More interesting regions are those with enough trade count, enough entry-to-exit distance, and less dependence on a single parameter choice.
 
-## Selected Outputs
+The project should be read as a first research pass. It identifies useful diagnostics and failure modes, but it does not establish a deployable strategy.
 
-### Entry Deviation vs Forward Rebound
+## Diagnostics
 
-<p align="center">
-  <img src="reports/figures/xauusd_rebound_vs_entrydev_2x2_1y.png" alt="Entry deviation versus future rebound" width="900">
-</p>
+| Output | Description |
+| --- | --- |
+| <img src="reports/figures/xauusd_rebound_vs_entrydev_2x2_1y.png" alt="Entry deviation versus future rebound" width="430"> | Event-study view of entry deviation versus forward rebound. Used to inspect whether candidate areas are broad or isolated. |
+| <img src="reports/figures/xauusd_HOSTILE_AUDIT_harsh_case_equity.png" alt="Hostile audit equity curve" width="430"> | Equity curve under harsher assumptions. Used as a stress check against overly generous execution assumptions. |
+| <img src="reports/figures/xauusd_strict_feature_importance.png" alt="Feature importance for event filtering" width="430"> | Feature-importance diagnostic for the event filter. Used to inspect which entry-time variables the model relied on. |
+| <img src="reports/figures/xauusd_LONGHORIZON_test_cost_sensitivity.png" alt="Cost sensitivity analysis" width="430"> | Cost-sensitivity test. Important because short-horizon strategies can fail quickly as frictions increase. |
 
-This chart was used to inspect how different deviation levels relate to future rebound behaviour. The goal was to avoid selecting a parameter area from one isolated result.
-
-### Hostile-Audit Equity Curve
-
-<p align="center">
-  <img src="reports/figures/xauusd_HOSTILE_AUDIT_harsh_case_equity.png" alt="Hostile audit equity curve" width="900">
-</p>
-
-This run applies harsher assumptions to check whether the backtest depends on overly generous execution settings.
-
-### Feature Importance
-
-<p align="center">
-  <img src="reports/figures/xauusd_strict_feature_importance.png" alt="Feature importance for event filtering" width="900">
-</p>
-
-The feature-importance plot was used as a diagnostic for the event filter. It shows which entry-time variables were used most by the model.
-
-### Cost Sensitivity
-
-<p align="center">
-  <img src="reports/figures/xauusd_LONGHORIZON_test_cost_sensitivity.png" alt="Cost sensitivity analysis" width="900">
-</p>
-
-Cost sensitivity is one of the main checks in this project. Short-horizon strategies can fail quickly when fees and slippage are increased.
-
-## Repository Layout
+## Repository Status
 
 ```text
-reports/figures/   saved figures from the research runs
-notebooks/         reserved for public notebooks
-src/               reserved for public research code
+reports/figures/   saved figures from research runs
+notebooks/         placeholder for public notebooks
+src/               placeholder for public research code
 ```
 
-At the moment this repository is mainly a public research summary with saved outputs. The full code and data pipeline are not packaged as a clean reproduction workflow yet.
-
-## Tools
-
-- Python
-- pandas
-- polars
-- NumPy
-- scikit-learn
-- matplotlib
-- Jupyter
-- parquet
-- R
+This repository currently documents the research and selected outputs. It is not yet a clean reproduction package.
 
 ## Limitations
 
 - Single-instrument study.
 - No order book data.
 - No live or paper-trading validation.
-- Broker-specific spread, latency, and fill assumptions are simplified.
-- Parameter search still carries data-mining risk.
-- Public repository does not yet contain a full reproducible code pipeline.
+- Simplified spread, latency, and fill assumptions.
+- Manual parameter selection still introduces data-mining risk.
+- Public repository does not yet include the full research pipeline.
 
-## Next Step
+## Tools
 
-The next version should reduce manual parameter selection and test whether the same idea behaves consistently across different instruments and regimes.
+Python, pandas, polars, NumPy, scikit-learn, matplotlib, Jupyter, parquet, R.
 
-That continuation is developed here:
+## Next Version
+
+The next version moves away from a fixed single-market setup and tests a more adaptive workflow across multiple instruments and regimes:
 
 [Adaptive Parameter Optimisation Algorithm](https://github.com/RomanMski/Adaptive_Parameter_Optimisation_Algorithm)
