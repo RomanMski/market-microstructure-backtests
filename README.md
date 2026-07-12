@@ -51,7 +51,6 @@ Before testing signals, I wanted to understand what "large deviation" even means
 Stress Case Equity And Drawdown
 This is not shown as proof that the strategy is ready. I mainly used it as a hostile audit view. If a setup only survives with generous assumptions, I do not trust it. The drawdown chart matters just as much as the equity line.
 <p align="center">
-  <img src="reports/figures/xauusd_HOSTILE_AUDIT_harsh_case_equity.png" alt="Hostile audit equity curve" width="420">
   <img src="reports/figures/xauusd_HOSTILE_AUDIT_harsh_case_drawdown.png" alt="Hostile audit drawdown" width="420">
 </p>
 
